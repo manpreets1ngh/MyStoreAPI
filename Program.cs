@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using ApplicationToSellThings.APIs.Static;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ApplicationToSellThingsAPIsContext>(options =>
@@ -15,6 +17,10 @@ builder.Services.AddDbContext<ApplicationToSellThingsAPIsContext>(options =>
 
 builder.Services.AddDbContext<ApplicationToSellThingsAPIIdentityContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("ApplicationToSellThingsAPIIdentityContextConnection") ?? throw new InvalidOperationException("Connection string 'ApplicationToSellThingsAPIsContext' not found.")));
+builder.Services.Configure<SquareSettings>(builder.Configuration.GetSection("SquareSettings"));
+builder.Services.AddSingleton<SquareSettings>(sp =>
+    sp.GetRequiredService<IOptions<SquareSettings>>().Value);
+
 
 builder.Services.AddIdentity<ApplicationToSellThingsAPIsUser, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddRoles<IdentityRole>()
@@ -33,16 +39,24 @@ builder.Services.AddScoped<IOrdersService, OrdersService>();
 builder.Services.AddScoped<IAddressService, AddressService>();
 builder.Services.AddScoped<ICardService, CardService>();
 builder.Services.AddScoped<IStatusService, StatusService>();
+builder.Services.AddScoped<IImageService, ImageService>();
 builder.Services.AddScoped<EmailService>();
 
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowClientOrigin", builder =>
     {
-        builder.WithOrigins("http://localhost:5282") // Replace with your client application's URL
+        builder.AllowAnyOrigin() // Replace with your client application's URL
             .AllowAnyHeader()
             .AllowAnyMethod();
     });
+});
+
+// Add HTTPS redirection
+builder.Services.AddHttpsRedirection(options =>
+{
+    options.RedirectStatusCode = StatusCodes.Status307TemporaryRedirect;
+    options.HttpsPort = 5001; // Ensure this matches the HTTPS port
 });
 
 builder.Services.Configure<IdentityOptions>(options =>
@@ -95,7 +109,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseCors("AllowClientOrigin");
+app.UseCors("AllowAll");
+app.UseStaticFiles();
 
 app.UseAuthentication();
 app.UseAuthorization();

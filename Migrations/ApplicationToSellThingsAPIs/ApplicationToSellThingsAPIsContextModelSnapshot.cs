@@ -202,7 +202,7 @@ namespace ApplicationToSellThings.APIs.Migrations.ApplicationToSellThingsAPIs
 
                     b.HasIndex("ShippingInfoId");
 
-                    b.ToTable("Orders");
+                    b.ToTable("Orders", (string)null);
                 });
 
             modelBuilder.Entity("ApplicationToSellThings.APIs.Models.OrderDetail", b =>
@@ -234,7 +234,7 @@ namespace ApplicationToSellThings.APIs.Migrations.ApplicationToSellThingsAPIs
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("OrderDetails");
+                    b.ToTable("OrderDetails", (string)null);
                 });
 
             modelBuilder.Entity("ApplicationToSellThings.APIs.Models.Product", b =>
@@ -276,7 +276,7 @@ namespace ApplicationToSellThings.APIs.Migrations.ApplicationToSellThingsAPIs
 
                     b.HasKey("ProductId");
 
-                    b.ToTable("Products");
+                    b.ToTable("Products", (string)null);
                 });
 
             modelBuilder.Entity("ApplicationToSellThings.APIs.Models.ShippingInfoModel", b =>
@@ -287,9 +287,6 @@ namespace ApplicationToSellThings.APIs.Migrations.ApplicationToSellThingsAPIs
 
                     b.Property<DateTime?>("ActualDeliveryDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<int>("DeliveryStatusId")
-                        .HasColumnType("int");
 
                     b.Property<DateTime?>("EstimatedDeliveryDate")
                         .HasColumnType("datetime2");
@@ -302,18 +299,18 @@ namespace ApplicationToSellThings.APIs.Migrations.ApplicationToSellThingsAPIs
 
                     b.HasKey("ShippingInfoId");
 
-                    b.HasIndex("DeliveryStatusId");
+                    b.HasIndex("StatusId");
 
-                    b.ToTable("ShippingInfos");
+                    b.ToTable("ShippingInfos", (string)null);
                 });
 
             modelBuilder.Entity("ApplicationToSellThings.APIs.Models.StatusModel", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("StatusId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("StatusId"), 1L, 1);
 
                     b.Property<string>("Alias")
                         .IsRequired()
@@ -327,9 +324,9 @@ namespace ApplicationToSellThings.APIs.Migrations.ApplicationToSellThingsAPIs
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id");
+                    b.HasKey("StatusId");
 
-                    b.ToTable("Status");
+                    b.ToTable("Status", (string)null);
                 });
 
             modelBuilder.Entity("ApplicationToSellThings.APIs.Models.AddressModel", b =>
@@ -391,7 +388,7 @@ namespace ApplicationToSellThings.APIs.Migrations.ApplicationToSellThingsAPIs
                 {
                     b.HasOne("ApplicationToSellThings.APIs.Models.StatusModel", "DeliveryStatus")
                         .WithMany()
-                        .HasForeignKey("DeliveryStatusId")
+                        .HasForeignKey("StatusId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

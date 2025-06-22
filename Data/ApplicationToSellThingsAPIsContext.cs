@@ -24,9 +24,45 @@ namespace ApplicationToSellThings.APIs.Data
         {
             base.OnModelCreating(modelBuilder);
 
+            // Explicit table name mapping
+            modelBuilder.Entity<Product>().ToTable("Products");
+            modelBuilder.Entity<Order>().ToTable("Orders");
+            modelBuilder.Entity<OrderDetail>().ToTable("OrderDetails");
+            modelBuilder.Entity<ShippingInfoModel>().ToTable("ShippingInfos");
+            modelBuilder.Entity<StatusModel>().ToTable("Status");
+
+            // Unique index for OrderNumber in Orders
             modelBuilder.Entity<Order>()
                 .HasIndex(o => o.OrderNumber)
-                .IsUnique(); // Ensure the order number is unique
+                .IsUnique();
+
+            // Relationships
+            modelBuilder.Entity<Order>()
+                .HasOne(o => o.ShippingInfo)
+                .WithMany()
+                .HasForeignKey(o => o.ShippingInfoId);
+
+            modelBuilder.Entity<Order>()
+                .HasOne(o => o.ShippingAddress)
+                .WithMany()
+                .HasForeignKey(o => o.ShippingAddressId);
+
+            modelBuilder.Entity<ShippingInfoModel>()
+                .HasOne(s => s.DeliveryStatus)
+                .WithMany()
+                .HasForeignKey(s => s.StatusId);
+
+            modelBuilder.Entity<OrderDetail>()
+                .HasOne(od => od.Product)
+                .WithMany()
+                .HasForeignKey(od => od.ProductId);
+
+            modelBuilder.Entity<OrderDetail>()
+                .HasOne(od => od.Address)
+                .WithMany()
+                .HasForeignKey(od => od.AddressId);
+
         }
+
     }
 }

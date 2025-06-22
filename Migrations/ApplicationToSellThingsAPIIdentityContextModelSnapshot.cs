@@ -130,6 +130,38 @@ namespace ApplicationToSellThings.APIs.Migrations
                     b.ToTable("Addresses");
                 });
 
+            modelBuilder.Entity("ApplicationToSellThings.APIs.Models.CardModel", b =>
+                {
+                    b.Property<Guid>("CardId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("AddedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CardHolderName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CardNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Cvv")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("ExpiryDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("CardId");
+
+                    b.ToTable("CardDetails");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
                     b.Property<string>("Id")
@@ -266,7 +298,7 @@ namespace ApplicationToSellThings.APIs.Migrations
             modelBuilder.Entity("ApplicationToSellThings.APIs.Models.AddressModel", b =>
                 {
                     b.HasOne("ApplicationToSellThings.APIs.Areas.Identity.Data.ApplicationToSellThingsAPIsUser", "User")
-                        .WithMany("Addresses")
+                        .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -323,11 +355,6 @@ namespace ApplicationToSellThings.APIs.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("ApplicationToSellThings.APIs.Areas.Identity.Data.ApplicationToSellThingsAPIsUser", b =>
-                {
-                    b.Navigation("Addresses");
                 });
 #pragma warning restore 612, 618
         }

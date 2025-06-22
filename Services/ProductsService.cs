@@ -9,22 +9,41 @@ namespace ApplicationToSellThings.APIs.Services
     public class ProductsService : IProductsService
     {
         private readonly ApplicationToSellThingsAPIsContext _dbContext;
+        private readonly IImageService _imageService;
 
-        public ProductsService(ApplicationToSellThingsAPIsContext dbContext)
+        public ProductsService(ApplicationToSellThingsAPIsContext dbContext,  IImageService imageService)
         {
             _dbContext = dbContext;
+            _imageService = imageService;
         }
 
         public async Task<IEnumerable<Product>> GetProducts()
         {
             var products = _dbContext.Products.ToList();
+
+            foreach (var product in products)
+            {
+                if (!string.IsNullOrEmpty(product.ProductImage))
+                {
+                    // Ensure we pass only the filename, not a full/partial path
+                    string fileName = product.ProductImage.Contains("/images/") 
+                        ? product.ProductImage.Replace("/images/", "") 
+                        : product.ProductImage;
+                    
+                    product.ProductImage = _imageService.GetImageUrl(fileName);
+                }
+            }
+
             return products;
         }
+
 
         public async Task<ProductViewResponseModel> CreateProduct(Product product)
         {
             if (product != null)
             {
+                string savedImageFileName = await _imageService.SaveImageAsync(product.ProductImage);
+                string imageUrl = $"/images/{savedImageFileName}";
                 var productRequest = new Product()
                 {
                     ProductId = Guid.NewGuid(),
@@ -36,7 +55,7 @@ namespace ApplicationToSellThings.APIs.Services
                     Category = product.Category,
                     QuantityInStock = product.QuantityInStock,
                     CreatedAt = DateTime.Now,
-                    ProductImage = product.ProductImage,
+                    ProductImage = imageUrl,
                 };
                 
                 _dbContext.Products.Add(productRequest);
@@ -53,7 +72,7 @@ namespace ApplicationToSellThings.APIs.Services
                     Category = product.Category,
                     QuantityInStock = product.QuantityInStock,
                     CreatedAt = DateTime.Now,
-                    ProductImage = product.ProductImage,
+                    ProductImage = imageUrl,
                 };
 
                 return productResponse;
@@ -65,6 +84,16 @@ namespace ApplicationToSellThings.APIs.Services
         public async Task<Product> GetProductById(Guid id)
         {
             var product = await _dbContext.Products.FindAsync(id);
+             if (product == null) return null;
+
+            // Convert relative path to full URL
+            string baseUrl = "http://192.168.1.106:5000"; // Replace with your API base URL
+            string fullImageUrl = product.ProductImage != null
+                ? $"{baseUrl}{product.ProductImage}" // Ensure full URL
+                : null;
+
+                product.ProductImage = fullImageUrl;
+
             return product;
         }
 

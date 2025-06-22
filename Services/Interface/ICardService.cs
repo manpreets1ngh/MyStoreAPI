@@ -6,5 +6,6 @@ namespace ApplicationToSellThings.APIs.Services.Interface
     {
         Task<ResponseModel<CardResponseApiModel>> AddCardDetails(CardRequestApiModel cardRequestApiModel);
         Task<ResponseModel<CardResponseApiModel>> GetCardDetailsForUser(string userId);
+        Task<ProcessPaymentResponseModel> ProcessPayment(ProcessPaymentRequestModel model);
     }
 }

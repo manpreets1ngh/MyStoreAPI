@@ -1,9 +1,13 @@
 ﻿using ApplicationToSellThings.APIs.Areas.Identity.Data;
 using ApplicationToSellThings.APIs.Data;
 using ApplicationToSellThings.APIs.Models;
+using ApplicationToSellThings.APIs.Static;
 using ApplicationToSellThings.APIs.Services.Interface;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Square;
+using Square.Models;
+using Square.Exceptions;
 
 namespace ApplicationToSellThings.APIs.Services
 {
@@ -11,10 +15,12 @@ namespace ApplicationToSellThings.APIs.Services
     {
         private readonly ApplicationToSellThingsAPIIdentityContext _dbContext;
         private readonly UserManager<ApplicationToSellThingsAPIsUser> _userManager;
-        public CardService(ApplicationToSellThingsAPIIdentityContext dbContext, UserManager<ApplicationToSellThingsAPIsUser> userManager)
+        private readonly SquareSettings _squareSettings;
+        public CardService(ApplicationToSellThingsAPIIdentityContext dbContext, UserManager<ApplicationToSellThingsAPIsUser> userManager, SquareSettings squareSettings)
         {
             _dbContext = dbContext;
             _userManager = userManager;
+            _squareSettings = squareSettings;
         }
 
         public async Task<ResponseModel<CardResponseApiModel>> AddCardDetails(CardRequestApiModel cardRequestApiModel)
@@ -27,9 +33,8 @@ namespace ApplicationToSellThings.APIs.Services
                     CardId = Guid.NewGuid(),
                     UserId = cardRequestApiModel.UserId,
                     CardHolderName = cardRequestApiModel.CardHolderName,
-                    CardNumber = cardRequestApiModel.CardNumber,
-                    ExpiryDate = cardRequestApiModel.ExpiryDate,
-                    Cvv = cardRequestApiModel.Cvv,
+                    Last4Digits = cardRequestApiModel.Last4Digits,
+                    CardBrand = cardRequestApiModel.CardBrand,
                     AddedOn = DateTime.Now,
                 };
 
@@ -40,9 +45,8 @@ namespace ApplicationToSellThings.APIs.Services
                     var resultResponse = new CardResponseApiModel
                     {
                         CardHolderName = cardModel.CardHolderName,
-                        CardNumber = cardModel.CardNumber,
-                        ExpiryDate = cardModel.ExpiryDate,
-                        Cvv = cardModel.Cvv,
+                        Last4Digits = cardModel.Last4Digits,
+                        CardBrand = cardModel.CardBrand,
                         AddedOn = DateTime.Now
                     };
                     var response = new ResponseModel<CardResponseApiModel>()
@@ -75,7 +79,7 @@ namespace ApplicationToSellThings.APIs.Services
         public async Task<ResponseModel<CardResponseApiModel>> GetCardDetailsForUser(string userId)
         {
             List<CardResponseApiModel> cardResponseApiModel = new List<CardResponseApiModel>();
-            var cardDetails = await _dbContext.CardDetails.Where(a => a.UserId == userId).ToListAsync();
+            var cardDetails = await _dbContext.CardDetails.Where(a => a.UserId == userId).OrderByDescending(c => c.AddedOn).ToListAsync();
 
             if (cardDetails != null)
             {
@@ -85,9 +89,8 @@ namespace ApplicationToSellThings.APIs.Services
                     {
                         CardId = card.CardId,
                         CardHolderName = card.CardHolderName,
-                        CardNumber = card.CardNumber,
-                        ExpiryDate = card.ExpiryDate,
-                        Cvv = card.Cvv,
+                        Last4Digits = card.Last4Digits,
+                        CardBrand = card.CardBrand,
                         AddedOn = card.AddedOn
                     };
 
@@ -112,5 +115,79 @@ namespace ApplicationToSellThings.APIs.Services
             };
 
         }
+
+        public async Task<ProcessPaymentResponseModel> ProcessPayment(ProcessPaymentRequestModel model)
+        {
+            var user = await _userManager.FindByIdAsync(model.UserId);
+            if (user == null)
+            {
+                return new ProcessPaymentResponseModel
+                {
+                    Success = false,
+                    Message = "User not found"
+                };
+            }
+
+            var client = new SquareClient.Builder()
+                .Environment(Square.Environment.Sandbox)
+                .AccessToken(_squareSettings.AccessToken)
+                .Build();
+
+            var money = new Money.Builder()
+            .Amount(model.Amount)
+            .Currency("GBP")
+            .Build();
+
+            var paymentRequest = new CreatePaymentRequest.Builder(
+                model.Nonce,
+                Guid.NewGuid().ToString(),
+                money // ✅ Required third parameter
+            )
+            .LocationId(_squareSettings.LocationId)
+            .Build();
+
+
+            try
+            {
+                var paymentResponse = await client.PaymentsApi.CreatePaymentAsync(paymentRequest);
+                var paymentId = paymentResponse.Payment.Id;
+
+                // Optionally store card metadata
+                Guid? cardId = null;
+                if (model.SaveCard)
+                {
+                    var cardModel = new CardModel
+                    {
+                        CardId = Guid.NewGuid(),
+                        UserId = model.UserId,
+                        CardHolderName = $"{user.FirstName} {user.LastName}",
+                        Last4Digits = paymentResponse.Payment.CardDetails.Card.Last4,
+                        CardBrand = paymentResponse.Payment.CardDetails.Card.CardBrand,
+                        AddedOn = DateTime.UtcNow
+                    };
+
+                    _dbContext.CardDetails.Add(cardModel);
+                    await _dbContext.SaveChangesAsync();
+                    cardId = cardModel.CardId;
+                }
+
+                return new ProcessPaymentResponseModel
+                {
+                    Success = true,
+                    Message = "Payment successful",
+                    PaymentId = paymentId,
+                    CardId = cardId
+                };
+            }
+            catch (ApiException ex)
+            {
+                return new ProcessPaymentResponseModel
+                {
+                    Success = false,
+                    Message = string.Join(" | ", ex.Errors.Select(e => e.Detail))
+                };
+            }
+        }
+
     }
 }

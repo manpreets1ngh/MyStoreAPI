@@ -18,7 +18,7 @@ namespace ApplicationToSellThings.APIs.Services
         {
             try
             {
-                var status = await _dbContext.Status.FirstOrDefaultAsync(s => s.Id == id);
+                var status = await _dbContext.Status.FirstOrDefaultAsync(s => s.StatusId == id);
 
                 if (status != null)
                 {
@@ -61,7 +61,7 @@ namespace ApplicationToSellThings.APIs.Services
             var statuses = await _dbContext.Status
                 .Select(s => new
                 {
-                    s.Id,
+                    s.StatusId,
                     s.Alias,
                     s.Name,
                     s.Type
@@ -74,7 +74,7 @@ namespace ApplicationToSellThings.APIs.Services
                 {
                     var statusData = new StatusModel()
                     {
-                        Id = status.Id,
+                        StatusId = status.StatusId,
                         Name = status.Name,
                         Alias = status.Alias,
                         Type = status.Type                        

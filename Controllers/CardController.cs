@@ -17,7 +17,7 @@ namespace ApplicationToSellThings.APIs.Controllers
             _cardService = cardService;
         }
 
-        [Authorize(Policy = "UserPolicy")]
+        [AllowAnonymous]
         [HttpPost]
         public async Task<IActionResult> AddCard([FromBody] CardRequestApiModel cardRequestApiModel)
         {
@@ -25,12 +25,22 @@ namespace ApplicationToSellThings.APIs.Controllers
             return Ok(result);
         }
 
-        [Authorize(Policy = "UserPolicy")]
+        [AllowAnonymous]
         [HttpGet("{userId}")]
         public async Task<IActionResult> GetCardDetails(string userId)
         {
             var result = await _cardService.GetCardDetailsForUser(userId);
             return Ok(result);
         }
+
+        [HttpPost("process")]
+        public async Task<IActionResult> ProcessPayment([FromBody] ProcessPaymentRequestModel model)
+        {
+            var result = await _cardService.ProcessPayment(model);
+            if (result.Success)
+                return Ok(result);
+            return BadRequest(result);
+        }
+
     }
 }

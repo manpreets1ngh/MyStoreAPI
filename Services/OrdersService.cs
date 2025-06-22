@@ -39,7 +39,7 @@ namespace ApplicationToSellThings.APIs.Services
                 var shippingInfo = new ShippingInfoModel
                 {
                     ShippingInfoId = Guid.NewGuid(),
-                    DeliveryStatusId = deliveryStatusId
+                    StatusId = deliveryStatusId
                 };
                 _dbContext.ShippingInfos.Add(shippingInfo);
                 await _dbContext.SaveChangesAsync();
@@ -71,6 +71,7 @@ namespace ApplicationToSellThings.APIs.Services
                         OrderCreatedAt = DateTime.UtcNow,
                         ShippingInfoId = shippingInfo.ShippingInfoId,
                         ShippingAddressId = shippingAddress.Data.Id,
+                        ShippingMethod = orderRequestModel.ShippingMethod,
                         OrderDetails = new List<OrderDetail>()
                     };
 
@@ -124,6 +125,7 @@ namespace ApplicationToSellThings.APIs.Services
                         Tax = orderData.Tax,
                         OrderStatus = orderData.OrderStatus,
                         OrderCreatedAt = orderData.OrderCreatedAt,
+                        ShippingMethod = orderData.ShippingMethod,
                         OrderDetails = orderData.OrderDetails.Select(od => new OrderDetailApiResponseModel
                         {
                             ProductId = od.ProductId,
@@ -349,7 +351,7 @@ namespace ApplicationToSellThings.APIs.Services
                     order.ShippingInfo.ShippingDate = orderModel.ShippingInfo.ShippingDate;
                     order.ShippingInfo.EstimatedDeliveryDate = orderModel.ShippingInfo.EstimatedDeliveryDate;
                     order.ShippingInfo.ActualDeliveryDate = orderModel.ShippingInfo.ActualDeliveryDate;
-                    order.ShippingInfo.DeliveryStatusId = orderModel.ShippingInfo.DeliveryStatusId;
+                    order.ShippingInfo.StatusId = orderModel.ShippingInfo.StatusId;
                 }
 
                 // Update ShippingAddress
@@ -561,9 +563,9 @@ namespace ApplicationToSellThings.APIs.Services
                     order.ShippingInfo.ActualDeliveryDate = shippingInfoUpdates.ActualDeliveryDate ?? order.ShippingInfo.ActualDeliveryDate;
 
                     // Update DeliveryStatus if needed
-                    if (shippingInfoUpdates.DeliveryStatusId > 0 && shippingInfoUpdates.DeliveryStatusId != order.ShippingInfo.DeliveryStatusId)
+                    if (shippingInfoUpdates.StatusId > 0 && shippingInfoUpdates.StatusId != order.ShippingInfo.StatusId)
                     {
-                        order.ShippingInfo.DeliveryStatusId = shippingInfoUpdates.DeliveryStatusId;
+                        order.ShippingInfo.StatusId = shippingInfoUpdates.StatusId;
                     }
                 }
 
@@ -574,16 +576,16 @@ namespace ApplicationToSellThings.APIs.Services
                     {
                         case "Dispatched":
                             order.ShippingInfo.ShippingDate = DateTime.UtcNow;
-                            order.ShippingInfo.DeliveryStatusId = await GetDeliveryStatusIdByAlias("S_INTRANSIT");
+                            order.ShippingInfo.StatusId = await GetDeliveryStatusIdByAlias("S_INTRANSIT");
                             break;
 
                         case "Delivered":
                             order.ShippingInfo.ActualDeliveryDate = DateTime.UtcNow;
-                            order.ShippingInfo.DeliveryStatusId = await GetDeliveryStatusIdByAlias("S_DELIVERED");
+                            order.ShippingInfo.StatusId = await GetDeliveryStatusIdByAlias("S_DELIVERED");
                             break;
 
                         case "Cancelled":
-                            order.ShippingInfo.DeliveryStatusId = await GetDeliveryStatusIdByAlias("S_DELIVERYFAILED");
+                            order.ShippingInfo.StatusId = await GetDeliveryStatusIdByAlias("S_DELIVERYFAILED");
                             break;
 
                         default:
@@ -648,7 +650,7 @@ namespace ApplicationToSellThings.APIs.Services
                 throw new Exception($"Delivery status with alias '{alias}' not found.");
             }
 
-            return deliveryStatus.Id;
+            return deliveryStatus.StatusId;
         }
     }
 }

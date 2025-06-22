@@ -17,7 +17,7 @@ namespace ApplicationToSellThings.APIs.Controllers
             _addressService = addressService;
         }
 
-        [Authorize(Policy = "UserPolicy")]
+        [AllowAnonymous]
         [HttpPost]
         public async Task<IActionResult> AddAddress([FromBody]AddressRequestApiModel addressRequestApiModel)
         {
@@ -25,7 +25,7 @@ namespace ApplicationToSellThings.APIs.Controllers
             return Ok(result);
         }
 
-        [Authorize(Policy = "UserPolicy")]
+        [AllowAnonymous]
         [HttpGet("{userId}")]
         public async Task<IActionResult> GetAddressByUser(Guid userId)
         {
