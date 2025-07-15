@@ -23,19 +23,17 @@ jobs:
         run: dotnet restore "MyStoreAPI/MyStoreAPI.csproj"
 
       - name: Build
-        run: dotnet build "MyStoreAPI/MyStoreAPI.csproj" --configuration Release --no-restore
+        run: dotnet build "MyStoreAPI/MyStoreAPI.csproj" --no-restore --configuration Release
+      
+      # Optional: Only include this when you have tests
+      # - name: Run tests
+      #   run: dotnet test "MyStoreAPI.Tests/MyStoreAPI.Tests.csproj" --no-build --verbosity normal
 
-      - name: Run tests
-        run: dotnet test "MyStoreAPI/MyStoreAPI.csproj" --no-build --verbosity normal
+      - name: Publish Docker image
+        run: docker build -t manpreets115/mystoreapi:latest .
 
-      - name: Build Docker image
-        run: docker build -t manpreets115/mystoreapi:dev .
-
-      - name: Log in to DockerHub
+      - name: Login to DockerHub
         run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
 
       - name: Push Docker image
-        run: docker push manpreets115/mystoreapi:dev
-
-      - name: Run Docker container
-        run: docker run -d -p 8080:80 manpreets115/mystoreapi:dev
+        run: docker push manpreets115/mystoreapi:latest
