@@ -9,14 +9,11 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
 # Copy the csproj file and restore dependencies
-COPY ["MyStoreAPI/MyStoreAPI.csproj", "MyStoreAPI/"]
-RUN dotnet restore "MyStoreAPI/MyStoreAPI.csproj"
+COPY ["MyStoreAPI.csproj", "./"]
+RUN dotnet restore "MyStoreAPI.csproj"
 
 # Copy the rest of the source code
 COPY . .
-WORKDIR "/src/MyStoreAPI"
-
-# Build the project in Release mode
 RUN dotnet build "MyStoreAPI.csproj" -c Release -o /app/build
 
 # Publish the application
