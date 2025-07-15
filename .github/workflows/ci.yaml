@@ -20,10 +20,10 @@ jobs:
           dotnet-version: '8.0.x'
 
       - name: Restore dependencies
-        run: dotnet restore "MyStoreAPI/MyStoreAPI.csproj"
+        run: dotnet restore "MyStoreAPI.csproj"
 
       - name: Build
-        run: dotnet build "MyStoreAPI/MyStoreAPI.csproj" --no-restore --configuration Release
+        run: dotnet build "MyStoreAPI.csproj" --no-restore --configuration Release
       
       # Optional: Only include this when you have tests
       # - name: Run tests
