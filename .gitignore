@@ -1,24 +1,22 @@
-# Ignore build outputs
+# Build outputs
 bin/
 obj/
+
+# User settings
 *.user
 *.suo
-
-# Rider + VS settings
+*.vs/
 .idea/
 .vscode/
-*.DotSettings.user
 
-# Logs
-*.log
-
-# User secrets
-**/secrets.json
-
-# Config transforms
-*.config
-*.local.json
-
-# Global ignore files
+# OS files
 .DS_Store
 Thumbs.db
+
+# Secrets and configs
+*.log
+secrets.json
+*.local.json
+
+# Rider/JetBrains
+*.DotSettings.user
