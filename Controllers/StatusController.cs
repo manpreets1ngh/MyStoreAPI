@@ -1,9 +1,9 @@
-﻿using ApplicationToSellThings.APIs.Models;
-using ApplicationToSellThings.APIs.Services.Interface;
+﻿using MyStoreAPI.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using MyStoreAPI.Services.Interface;
 
-namespace ApplicationToSellThings.APIs.Controllers
+namespace MyStoreAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]

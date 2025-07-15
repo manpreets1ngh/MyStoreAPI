@@ -1,20 +1,18 @@
-﻿
-
-using ApplicationToSellThings.APIs.Areas.Identity.Data;
-using ApplicationToSellThings.APIs.Data;
-using ApplicationToSellThings.APIs.Models;
-using ApplicationToSellThings.APIs.Services.Interface;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using MyStoreAPI.Areas.Identity.Data;
+using MyStoreAPI.Data;
+using MyStoreAPI.Models;
+using MyStoreAPI.Services.Interface;
 
-namespace ApplicationToSellThings.APIs.Services
+namespace MyStoreAPI.Services
 {
     public class AddressService : IAddressService
     {
-        private readonly ApplicationToSellThingsAPIIdentityContext _dbContext;
-        private readonly UserManager<ApplicationToSellThingsAPIsUser> _userManager;
+        private readonly MyStoreAPIIdentityContext _dbContext;
+        private readonly UserManager<MyStoreAPIUser> _userManager;
 
-        public AddressService(ApplicationToSellThingsAPIIdentityContext dbContext, UserManager<ApplicationToSellThingsAPIsUser> userManager)
+        public AddressService(MyStoreAPIIdentityContext dbContext, UserManager<MyStoreAPIUser> userManager)
         { 
             _dbContext = dbContext;
             _userManager = userManager;

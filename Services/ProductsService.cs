@@ -1,17 +1,17 @@
-﻿using ApplicationToSellThings.APIs.Data;
-using ApplicationToSellThings.APIs.Models;
-using ApplicationToSellThings.APIs.Services.Interface;
-using Microsoft.CodeAnalysis;
+﻿using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
+using MyStoreAPI.Data;
+using MyStoreAPI.Models;
+using MyStoreAPI.Services.Interface;
 
-namespace ApplicationToSellThings.APIs.Services
+namespace MyStoreAPI.Services
 {
     public class ProductsService : IProductsService
     {
-        private readonly ApplicationToSellThingsAPIsContext _dbContext;
+        private readonly MyStoreAPIContext _dbContext;
         private readonly IImageService _imageService;
 
-        public ProductsService(ApplicationToSellThingsAPIsContext dbContext,  IImageService imageService)
+        public ProductsService(MyStoreAPIContext dbContext,  IImageService imageService)
         {
             _dbContext = dbContext;
             _imageService = imageService;

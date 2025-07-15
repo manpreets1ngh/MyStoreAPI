@@ -1,6 +1,6 @@
-﻿using ApplicationToSellThings.APIs.Models;
+﻿using MyStoreAPI.Models;
 
-namespace ApplicationToSellThings.APIs.Services.Interface
+namespace MyStoreAPI.Services.Interface
 {
     public interface IProductsService
     {

@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using ApplicationToSellThings.APIs.Models;
+using MyStoreAPI.Models;
 using Microsoft.AspNetCore.Identity;
 
-namespace ApplicationToSellThings.APIs.Areas.Identity.Data;
+namespace MyStoreAPI.Areas.Identity.Data;
 
-// Add profile data for application users by adding properties to the ApplicationToSellThingsAPIsUser class
-public class ApplicationToSellThingsAPIsUser : IdentityUser
+// Add profile data for application users by adding properties to the MyStoreAPIUser class
+public class MyStoreAPIUser : IdentityUser
 {
     public string FirstName { get; set; }
     public string LastName { get; set; }

@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace ApplicationToSellThings.APIs.Migrations
+namespace MyStoreAPI.Migrations
 {
     public partial class ModifiesIdentityCreate : Migration
     {

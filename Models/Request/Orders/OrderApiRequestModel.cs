@@ -1,4 +1,4 @@
-﻿namespace ApplicationToSellThings.APIs.Models
+﻿namespace MyStoreAPI.Models
 {
     public class OrderApiRequestModel
     {

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace ApplicationToSellThings.APIs.Models
+namespace MyStoreAPI.Models
 {
     public class RegisterModel
     {

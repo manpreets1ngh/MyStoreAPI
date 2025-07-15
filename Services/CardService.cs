@@ -1,22 +1,22 @@
-﻿using ApplicationToSellThings.APIs.Areas.Identity.Data;
-using ApplicationToSellThings.APIs.Data;
-using ApplicationToSellThings.APIs.Models;
-using ApplicationToSellThings.APIs.Static;
-using ApplicationToSellThings.APIs.Services.Interface;
+﻿using MyStoreAPI.Static;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using MyStoreAPI.Areas.Identity.Data;
+using MyStoreAPI.Data;
+using MyStoreAPI.Models;
+using MyStoreAPI.Services.Interface;
 using Square;
 using Square.Models;
 using Square.Exceptions;
 
-namespace ApplicationToSellThings.APIs.Services
+namespace MyStoreAPI.Services
 {
     public class CardService : ICardService
     {
-        private readonly ApplicationToSellThingsAPIIdentityContext _dbContext;
-        private readonly UserManager<ApplicationToSellThingsAPIsUser> _userManager;
+        private readonly MyStoreAPIIdentityContext _dbContext;
+        private readonly UserManager<MyStoreAPIUser> _userManager;
         private readonly SquareSettings _squareSettings;
-        public CardService(ApplicationToSellThingsAPIIdentityContext dbContext, UserManager<ApplicationToSellThingsAPIsUser> userManager, SquareSettings squareSettings)
+        public CardService(MyStoreAPIIdentityContext dbContext, UserManager<MyStoreAPIUser> userManager, SquareSettings squareSettings)
         {
             _dbContext = dbContext;
             _userManager = userManager;

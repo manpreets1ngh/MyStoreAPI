@@ -1,28 +1,28 @@
-﻿using ApplicationToSellThings.APIs.Areas.Identity.Data;
-using ApplicationToSellThings.APIs.Models;
-using ApplicationToSellThings.APIs.Services;
-using ApplicationToSellThings.APIs.Static;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using System.Web;
+using MyStoreAPI.Areas.Identity.Data;
+using MyStoreAPI.Models;
+using MyStoreAPI.Services;
+using MyStoreAPI.Static;
 
-namespace ApplicationToSellThings.APIs.Controllers
+namespace MyStoreAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     public class AuthController : ControllerBase
     {
         private readonly ILogger<AuthController> _logger;
-        private readonly UserManager<ApplicationToSellThingsAPIsUser> userManager;
+        private readonly UserManager<MyStoreAPIUser> userManager;
         private readonly RoleManager<IdentityRole> roleManager;
         private readonly IConfiguration _configuration;
         private readonly IServiceProvider _serviceProvider;
         private readonly EmailService _emailService;
-        public AuthController(ILogger<AuthController> logger, UserManager<ApplicationToSellThingsAPIsUser> userManager, RoleManager<IdentityRole> roleManager,
+        public AuthController(ILogger<AuthController> logger, UserManager<MyStoreAPIUser> userManager, RoleManager<IdentityRole> roleManager,
             IConfiguration configuration, IServiceProvider serviceProvider, EmailService emailService)
         {
             _logger = logger;
@@ -43,7 +43,7 @@ namespace ApplicationToSellThings.APIs.Controllers
                 if (userExists != null)
                     return StatusCode(StatusCodes.Status500InternalServerError, new ResponseModel<string> { Status = "Error", Message = "Admin User already exists!" });
 
-                ApplicationToSellThingsAPIsUser user = new()
+                MyStoreAPIUser user = new()
                 {
                     Email = model.Email,
                     SecurityStamp = Guid.NewGuid().ToString(),
@@ -82,7 +82,7 @@ namespace ApplicationToSellThings.APIs.Controllers
                 if (userExists != null)
                     return StatusCode(StatusCodes.Status500InternalServerError, new ResponseModel<string> { Status = "Error", Message = "User already exists!" });
 
-                ApplicationToSellThingsAPIsUser user = new()
+                MyStoreAPIUser user = new()
                 {
                     Email = model.Email,
                     SecurityStamp = Guid.NewGuid().ToString(),

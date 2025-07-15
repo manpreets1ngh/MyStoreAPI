@@ -1,22 +1,22 @@
-﻿using ApplicationToSellThings.APIs.Areas.Identity.Data;
-using ApplicationToSellThings.APIs.Data;
-using ApplicationToSellThings.APIs.Models;
-using ApplicationToSellThings.APIs.Services.Interface;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
+using MyStoreAPI.Areas.Identity.Data;
+using MyStoreAPI.Data;
+using MyStoreAPI.Models;
+using MyStoreAPI.Services.Interface;
 
-namespace ApplicationToSellThings.APIs.Services
+namespace MyStoreAPI.Services
 {
     public class OrdersService : IOrdersService
     {
-        private readonly ApplicationToSellThingsAPIsContext _dbContext;
+        private readonly MyStoreAPIContext _dbContext;
         private readonly IAddressService _addressService;
         private readonly IStatusService _statusService;
         private readonly EmailService _emailService;
-        private readonly UserManager<ApplicationToSellThingsAPIsUser> userManager;
-        public OrdersService(ApplicationToSellThingsAPIsContext dbContext, IAddressService addressService, IStatusService statusService, 
-            EmailService emailService, UserManager<ApplicationToSellThingsAPIsUser> userManager)
+        private readonly UserManager<MyStoreAPIUser> userManager;
+        public OrdersService(MyStoreAPIContext dbContext, IAddressService addressService, IStatusService statusService, 
+            EmailService emailService, UserManager<MyStoreAPIUser> userManager)
         {
             _dbContext = dbContext;
             _addressService = addressService;

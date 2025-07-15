@@ -1,10 +1,10 @@
-﻿using ApplicationToSellThings.APIs.Models;
-using ApplicationToSellThings.APIs.Services.Interface;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using MyStoreAPI.Models;
+using MyStoreAPI.Services.Interface;
 
-namespace ApplicationToSellThings.APIs.Controllers
+namespace MyStoreAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]

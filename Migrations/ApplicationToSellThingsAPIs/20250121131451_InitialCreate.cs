@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace ApplicationToSellThings.APIs.Migrations.ApplicationToSellThingsAPIs
+namespace MyStoreAPI.Migrations.ApplicationToSellThingsAPIs
 {
     public partial class InitialCreate : Migration
     {
@@ -27,7 +27,7 @@ namespace ApplicationToSellThings.APIs.Migrations.ApplicationToSellThingsAPIs
                 });
 
             migrationBuilder.CreateTable(
-                name: "ApplicationToSellThingsAPIsUser",
+                name: "MyStoreAPIUser",
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
@@ -106,7 +106,7 @@ namespace ApplicationToSellThings.APIs.Migrations.ApplicationToSellThingsAPIs
                     table.ForeignKey(
                         name: "FK_AddressModel_ApplicationToSellThingsAPIsUser_UserId",
                         column: x => x.UserId,
-                        principalTable: "ApplicationToSellThingsAPIsUser",
+                        principalTable: "MyStoreAPIUser",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -263,7 +263,7 @@ namespace ApplicationToSellThings.APIs.Migrations.ApplicationToSellThingsAPIs
                 name: "ShippingInfos");
 
             migrationBuilder.DropTable(
-                name: "ApplicationToSellThingsAPIsUser");
+                name: "MyStoreAPIUser");
 
             migrationBuilder.DropTable(
                 name: "Status");

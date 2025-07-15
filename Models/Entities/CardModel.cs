@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace ApplicationToSellThings.APIs.Models
+namespace MyStoreAPI.Models
 {
     public class CardModel
     {

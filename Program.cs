@@ -1,30 +1,30 @@
-using ApplicationToSellThings.APIs.Areas.Identity.Data;
-using ApplicationToSellThings.APIs.Data;
-using ApplicationToSellThings.APIs.Models;
-using ApplicationToSellThings.APIs.Services;
-using ApplicationToSellThings.APIs.Services.Interface;
+using MyStoreAPI.Areas.Identity.Data;
+using MyStoreAPI.Data;
+using MyStoreAPI.Models;
+using MyStoreAPI.Services;
+using MyStoreAPI.Services.Interface;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using ApplicationToSellThings.APIs.Static;
+using MyStoreAPI.Static;
 using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddDbContext<ApplicationToSellThingsAPIsContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("ApplicationToSellThingsAPIsContext") ?? throw new InvalidOperationException("Connection string 'ApplicationToSellThingsAPIsContext' not found.")));
+builder.Services.AddDbContext<MyStoreAPIContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("MyStoreAPIContext") ?? throw new InvalidOperationException("Connection string 'MyStoreAPIContext' not found.")));
 
-builder.Services.AddDbContext<ApplicationToSellThingsAPIIdentityContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("ApplicationToSellThingsAPIIdentityContextConnection") ?? throw new InvalidOperationException("Connection string 'ApplicationToSellThingsAPIsContext' not found.")));
+builder.Services.AddDbContext<MyStoreAPIIdentityContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("MyStoreAPIIdentityContextConnection") ?? throw new InvalidOperationException("Connection string 'MyStoreAPIContext' not found.")));
 builder.Services.Configure<SquareSettings>(builder.Configuration.GetSection("SquareSettings"));
 builder.Services.AddSingleton<SquareSettings>(sp =>
     sp.GetRequiredService<IOptions<SquareSettings>>().Value);
 
 
-builder.Services.AddIdentity<ApplicationToSellThingsAPIsUser, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true)
+builder.Services.AddIdentity<MyStoreAPIUser, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddRoles<IdentityRole>()
-    .AddEntityFrameworkStores<ApplicationToSellThingsAPIIdentityContext>();
+    .AddEntityFrameworkStores<MyStoreAPIIdentityContext>();
 
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 

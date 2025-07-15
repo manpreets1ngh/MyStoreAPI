@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace ApplicationToSellThings.APIs.Migrations
+namespace MyStoreAPI.Migrations
 {
     public partial class AddressAdded : Migration
     {

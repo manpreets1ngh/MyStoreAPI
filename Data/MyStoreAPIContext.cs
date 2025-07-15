@@ -3,22 +3,22 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using ApplicationToSellThings.APIs.Models;
+using MyStoreAPI.Models;
 
-namespace ApplicationToSellThings.APIs.Data
+namespace MyStoreAPI.Data
 {
-    public class ApplicationToSellThingsAPIsContext : DbContext
+    public class MyStoreAPIContext : DbContext
     {
-        public ApplicationToSellThingsAPIsContext (DbContextOptions<ApplicationToSellThingsAPIsContext> options)
+        public MyStoreAPIContext (DbContextOptions<MyStoreAPIContext> options)
             : base(options)
         {
         }
 
-        public DbSet<ApplicationToSellThings.APIs.Models.Product> Products { get; set; } = default!;
-        public DbSet<ApplicationToSellThings.APIs.Models.Order> Orders { get; set; } = default!;
-        public DbSet<ApplicationToSellThings.APIs.Models.ShippingInfoModel> ShippingInfos { get; set; } = default!;
-        public DbSet<ApplicationToSellThings.APIs.Models.StatusModel> Status { get; set; } = default!;
-        public DbSet<ApplicationToSellThings.APIs.Models.OrderDetail> OrderDetails { get; set; } = default!;
+        public DbSet<Product> Products { get; set; } = default!;
+        public DbSet<Order> Orders { get; set; } = default!;
+        public DbSet<ShippingInfoModel> ShippingInfos { get; set; } = default!;
+        public DbSet<StatusModel> Status { get; set; } = default!;
+        public DbSet<OrderDetail> OrderDetails { get; set; } = default!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

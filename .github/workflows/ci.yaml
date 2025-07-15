@@ -2,11 +2,9 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches:
-      - master
+    branches: [ master ]
   pull_request:
-    branches:
-      - master
+    branches: [ master ]
 
 jobs:
   build:
@@ -19,25 +17,25 @@ jobs:
       - name: Set up .NET
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: '6.0.x'
+          dotnet-version: '8.0.x'
 
       - name: Restore dependencies
-        run: dotnet restore "ApplicationToSellThings.APIs/ApplicationToSellThings.APIs.csproj"
+        run: dotnet restore "MyStoreAPI/MyStoreAPI.csproj"
 
       - name: Build
-        run: dotnet build "ApplicationToSellThings.APIs/ApplicationToSellThings.APIs.csproj" --configuration Release --no-restore
+        run: dotnet build "MyStoreAPI/MyStoreAPI.csproj" --configuration Release --no-restore
 
       - name: Run tests
-        run: dotnet test "ApplicationToSellThings.APIs/ApplicationToSellThings.APIs.csproj" --no-build --verbosity normal
+        run: dotnet test "MyStoreAPI/MyStoreAPI.csproj" --no-build --verbosity normal
 
       - name: Build Docker image
-        run: docker build -t manpreets115/applicationtosellthings.apis:dev .
+        run: docker build -t manpreets115/mystoreapi:dev .
 
       - name: Log in to DockerHub
         run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
 
       - name: Push Docker image
-        run: docker push manpreets115/applicationtosellthings.apis:dev
-  
+        run: docker push manpreets115/mystoreapi:dev
+
       - name: Run Docker container
-        run: docker run -d -p 8080:80 manpreets115/applicationtosellthings.apis:dev
+        run: docker run -d -p 8080:80 manpreets115/mystoreapi:dev

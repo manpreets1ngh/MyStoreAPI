@@ -1,9 +1,9 @@
 ﻿using System.Net.Mail;
 using System.Net;
-using ApplicationToSellThings.APIs.Models;
 using Microsoft.Extensions.Options;
+using MyStoreAPI.Models;
 
-namespace ApplicationToSellThings.APIs.Services
+namespace MyStoreAPI.Services
 {
     public class EmailService
     {

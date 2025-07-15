@@ -1,15 +1,15 @@
-﻿using ApplicationToSellThings.APIs.Data;
-using ApplicationToSellThings.APIs.Models;
-using ApplicationToSellThings.APIs.Services.Interface;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using MyStoreAPI.Data;
+using MyStoreAPI.Models;
+using MyStoreAPI.Services.Interface;
 
-namespace ApplicationToSellThings.APIs.Services
+namespace MyStoreAPI.Services
 {
     public class StatusService : IStatusService
     { 
-        private readonly ApplicationToSellThingsAPIsContext _dbContext;
+        private readonly MyStoreAPIContext _dbContext;
 
-        public StatusService(ApplicationToSellThingsAPIsContext dbContext)
+        public StatusService(MyStoreAPIContext dbContext)
         {
             _dbContext = dbContext;
         }

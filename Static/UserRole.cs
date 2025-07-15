@@ -1,4 +1,4 @@
-﻿namespace ApplicationToSellThings.APIs.Static
+﻿namespace MyStoreAPI.Static
 {
     public static class UserRole
     {

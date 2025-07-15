@@ -1,9 +1,9 @@
-﻿using ApplicationToSellThings.APIs.Areas.Identity.Data;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using MyStoreAPI.Areas.Identity.Data;
 
-namespace ApplicationToSellThings.APIs.Models
+namespace MyStoreAPI.Models
 {
     public class AddressModel
     {
@@ -18,6 +18,6 @@ namespace ApplicationToSellThings.APIs.Models
         public string PostCode { get; set; }
         public string Country { get; set; }
 
-        public virtual ApplicationToSellThingsAPIsUser User { get; set; } // Navigation property
+        public virtual MyStoreAPIUser User { get; set; } // Navigation property
     }
 }

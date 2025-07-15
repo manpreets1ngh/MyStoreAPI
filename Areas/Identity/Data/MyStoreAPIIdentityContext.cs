@@ -1,16 +1,16 @@
-﻿using ApplicationToSellThings.APIs.Areas.Identity.Data;
-using ApplicationToSellThings.APIs.Models;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
 using System.Reflection.Emit;
+using MyStoreAPI.Areas.Identity.Data;
+using MyStoreAPI.Models;
 
-namespace ApplicationToSellThings.APIs.Data;
+namespace MyStoreAPI.Data;
 
-public class ApplicationToSellThingsAPIIdentityContext : IdentityDbContext<ApplicationToSellThingsAPIsUser>
+public class MyStoreAPIIdentityContext : IdentityDbContext<MyStoreAPIUser>
 {
-    public ApplicationToSellThingsAPIIdentityContext(DbContextOptions<ApplicationToSellThingsAPIIdentityContext> options)
+    public MyStoreAPIIdentityContext(DbContextOptions<MyStoreAPIIdentityContext> options)
         : base(options)
     {
     }
@@ -20,7 +20,7 @@ public class ApplicationToSellThingsAPIIdentityContext : IdentityDbContext<Appli
         base.OnModelCreating(builder);
 /*
         builder.Entity<AddressModel>()
-        .HasOne<ApplicationToSellThingsAPIsUser>(a => a.User)
+        .HasOne<MyStoreAPIUser>(a => a.User)
         .WithMany(u => u.Addresses)
         .HasForeignKey(a => a.UserId);*/
         // Customize the ASP.NET Identity model and override the defaults if needed.
