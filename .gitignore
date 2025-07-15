@@ -1,0 +1,24 @@
+# Ignore build outputs
+bin/
+obj/
+*.user
+*.suo
+
+# Rider + VS settings
+.idea/
+.vscode/
+*.DotSettings.user
+
+# Logs
+*.log
+
+# User secrets
+**/secrets.json
+
+# Config transforms
+*.config
+*.local.json
+
+# Global ignore files
+.DS_Store
+Thumbs.db

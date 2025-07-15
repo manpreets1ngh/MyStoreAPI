@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\manpr\\Github\\ApplicationToSellThingsAPI\\ApplicationToSellThings.APIs.csproj": {}
+    "C:\\Users\\Manny\\Desktop\\ApplicationToSellThingsAPI\\ApplicationToSellThings.APIs.csproj": {}
   },
   "projects": {
-    "C:\\Users\\manpr\\Github\\ApplicationToSellThingsAPI\\ApplicationToSellThings.APIs.csproj": {
+    "C:\\Users\\Manny\\Desktop\\ApplicationToSellThingsAPI\\ApplicationToSellThings.APIs.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\manpr\\Github\\ApplicationToSellThingsAPI\\ApplicationToSellThings.APIs.csproj",
+        "projectUniqueName": "C:\\Users\\Manny\\Desktop\\ApplicationToSellThingsAPI\\ApplicationToSellThings.APIs.csproj",
         "projectName": "ApplicationToSellThings.APIs",
-        "projectPath": "C:\\Users\\manpr\\Github\\ApplicationToSellThingsAPI\\ApplicationToSellThings.APIs.csproj",
-        "packagesPath": "C:\\Users\\manpr\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\manpr\\Github\\ApplicationToSellThingsAPI\\obj\\",
+        "projectPath": "C:\\Users\\Manny\\Desktop\\ApplicationToSellThingsAPI\\ApplicationToSellThings.APIs.csproj",
+        "packagesPath": "C:\\Users\\Manny\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Manny\\Desktop\\ApplicationToSellThingsAPI\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\manpr\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\Manny\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
