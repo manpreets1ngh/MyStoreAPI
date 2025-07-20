@@ -13,11 +13,16 @@ using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<MyStoreAPIContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("MyStoreAPIContext") ?? throw new InvalidOperationException("Connection string 'MyStoreAPIContext' not found.")));
+    options.UseSqlServer(Environment.GetEnvironmentVariable("CONNECTION_STRING_CONTEXT")));
 
 builder.Services.AddDbContext<MyStoreAPIIdentityContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("MyStoreAPIIdentityContextConnection") ?? throw new InvalidOperationException("Connection string 'MyStoreAPIContext' not found.")));
-builder.Services.Configure<SquareSettings>(builder.Configuration.GetSection("SquareSettings"));
+    options.UseSqlServer(Environment.GetEnvironmentVariable("CONNECTION_STRING_IDENTITY")));
+
+builder.Services.Configure<SquareSettings>(options =>
+{
+    options.AccessToken = Environment.GetEnvironmentVariable("SQUARE_AccessToken");
+    options.LocationId = Environment.GetEnvironmentVariable("SQUARE_LocationId");
+});
 builder.Services.AddSingleton<SquareSettings>(sp =>
     sp.GetRequiredService<IOptions<SquareSettings>>().Value);
 
@@ -26,7 +31,15 @@ builder.Services.AddIdentity<MyStoreAPIUser, IdentityRole>(options => options.Si
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<MyStoreAPIIdentityContext>();
 
-builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+builder.Services.Configure<EmailSettings>(options =>
+{
+    options.SmtpHost = Environment.GetEnvironmentVariable("EMAIL_SmtpHost");
+    options.SmtpPort = int.Parse(Environment.GetEnvironmentVariable("EMAIL_SmtpPort") ?? "25");
+    options.SmtpUser = Environment.GetEnvironmentVariable("EMAIL_SmtpUser");
+    options.SmtpPass = Environment.GetEnvironmentVariable("EMAIL_SmtpPass");
+    options.FromEmail = Environment.GetEnvironmentVariable("EMAIL_FromEmail");
+    options.FromName = Environment.GetEnvironmentVariable("EMAIL_FromName");
+});
 
 // Add services to the container.
 
@@ -71,6 +84,47 @@ builder.Services.Configure<IdentityOptions>(options =>
 });
 
 // Adding Authentication
+// Add support for env + appsettings
+builder.Configuration
+    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true)
+    .AddEnvironmentVariables();
+
+// Bind JWT section
+var jwtSettings = new JwtSettings();
+builder.Configuration.Bind("JWT", jwtSettings);
+
+// Override with env vars if present
+jwtSettings.ValidIssuer = Environment.GetEnvironmentVariable("JWT_ValidIssuer") ?? jwtSettings.ValidIssuer;
+jwtSettings.ValidAudience = Environment.GetEnvironmentVariable("JWT_ValidAudience") ?? jwtSettings.ValidAudience;
+jwtSettings.Secret = Environment.GetEnvironmentVariable("JWT_Secret") ?? jwtSettings.Secret;
+jwtSettings.TokenExpiryTimeInHour = Environment.GetEnvironmentVariable("JWT_TokenExpiryTimeInHour") ?? jwtSettings.TokenExpiryTimeInHour;
+
+// Register auth with injected values
+builder.Services.AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(options =>
+    {
+        options.SaveToken = true;
+        options.RequireHttpsMetadata = false;
+        options.TokenValidationParameters = new TokenValidationParameters()
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidAudience = jwtSettings.ValidAudience,
+            ValidIssuer = jwtSettings.ValidIssuer,
+            ClockSkew = TimeSpan.Zero,
+            IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(jwtSettings.Secret))
+        };
+    });
+
+/*
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -92,6 +146,7 @@ builder.Services.AddAuthentication(options =>
         IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(builder.Configuration["JWT:Secret"]))
     };
 });
+*/
 
 builder.Services.AddAuthorization(options =>
 {

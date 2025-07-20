@@ -1,35 +1,80 @@
-name: CI/CD Pipeline
+name: MyStoreAPI CI/CD
 
 on:
   push:
-    branches: [ master ]
+    branches:
+      - master
+      - feature/**
+
   pull_request:
-    branches: [ master ]
+    branches:
+      - master
+
+  workflow_dispatch:  # Manual trigger for production deploy
 
 jobs:
-  build:
+  build-and-validate-dev:
+    name: 🔧 Build & Validate (Dev)
+    if: github.event_name == 'push' || github.event_name == 'pull_request'
     runs-on: ubuntu-latest
+    environment: development
+
+    env:
+      ASPNETCORE_ENVIRONMENT: Development
+      CONNECTION_STRING_CONTEXT: ${{ secrets.CONNECTION_STRING_CONTEXT }}
+      CONNECTION_STRING_IDENTITY: ${{ secrets.CONNECTION_STRING_IDENTITY }}
+      JWT_ValidIssuer: ${{ secrets.JWT_ValidIssuer }}
+      JWT_ValidAudience: ${{ secrets.JWT_ValidAudience }}
+      JWT_Secret: ${{ secrets.JWT_Secret }}
+      JWT_TokenExpiryTimeInHour: ${{ secrets.JWT_TokenExpiryTimeInHour }}
+      EMAIL_SMTPSERVER: ${{ secrets.EMAIL_SMTPSERVER }}
+      EMAIL_SMTPPORT: ${{ secrets.EMAIL_SMTPPORT }}
+      EMAIL_SMTPUSER: ${{ secrets.EMAIL_SMTPUSER }}
+      EMAIL_SMTPPASS: ${{ secrets.EMAIL_SMTPPASS }}
+      EMAIL_FROMEMAIL: ${{ secrets.EMAIL_FROMEMAIL }}
+      EMAIL_FROMNAME: ${{ secrets.EMAIL_FROMNAME }}
+      SQUARE_ACCESSTOKEN: ${{ secrets.SQUARE_ACCESSTOKEN }}
+      SQUARE_LOCATIONID: ${{ secrets.SQUARE_LOCATIONID }}
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Set up .NET
-        uses: actions/setup-dotnet@v1
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
 
-      - name: Restore dependencies
-        run: dotnet restore "MyStoreAPI.csproj"
+      - name: Restore
+        run: dotnet restore MyStoreAPI.csproj
 
       - name: Build
-        run: dotnet build "MyStoreAPI.csproj" --no-restore --configuration Release
-      
-      # Optional: Only include this when you have tests
-      # - name: Run tests
-      #   run: dotnet test "MyStoreAPI.Tests/MyStoreAPI.Tests.csproj" --no-build --verbosity normal
+        run: dotnet build MyStoreAPI.csproj --no-restore --configuration Release
 
-      - name: Publish Docker image
+  deploy-production:
+    name: 🚀 Build & Push Docker Image (Prod)
+    if: github.event_name == 'workflow_dispatch'
+    needs: build-and-validate-dev
+    runs-on: ubuntu-latest
+    environment: production
+
+    env:
+      ASPNETCORE_ENVIRONMENT: Production
+      JWT_ValidIssuer: ${{ secrets.JWT_ValidIssuer }}
+      JWT_ValidAudience: ${{ secrets.JWT_ValidAudience }}
+      JWT_Secret: ${{ secrets.JWT_Secret }}
+      JWT_TokenExpiryTimeInHour: ${{ secrets.JWT_TokenExpiryTimeInHour }}
+      CONNECTION_STRING_CONTEXT: ${{ secrets.CONNECTION_STRING_CONTEXT }}
+      CONNECTION_STRING_IDENTITY: ${{ secrets.CONNECTION_STRING_IDENTITY }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
         run: docker build -t manpreets115/mystoreapi:latest .
 
       - name: Login to DockerHub
