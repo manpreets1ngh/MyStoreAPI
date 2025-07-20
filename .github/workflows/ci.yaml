@@ -5,65 +5,80 @@ on:
     branches:
       - master
       - feature/**
+
   pull_request:
     branches:
       - master
-  workflow_dispatch:
+
+  workflow_dispatch:  # Manual trigger for production deploy
 
 jobs:
-  build-and-test:
-    name: Build & Validate Code (Dev)
+  build-and-validate-dev:
+    name: 🔧 Build & Validate (Dev)
+    if: github.event_name == 'push' || github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     environment: development
 
     env:
+      ASPNETCORE_ENVIRONMENT: Development
+      CONNECTION_STRING_CONTEXT: ${{ secrets.CONNECTION_STRING_CONTEXT }}
+      CONNECTION_STRING_IDENTITY: ${{ secrets.CONNECTION_STRING_IDENTITY }}
       JWT_ValidIssuer: ${{ secrets.JWT_ValidIssuer }}
       JWT_ValidAudience: ${{ secrets.JWT_ValidAudience }}
       JWT_Secret: ${{ secrets.JWT_Secret }}
       JWT_TokenExpiryTimeInHour: ${{ secrets.JWT_TokenExpiryTimeInHour }}
+      EMAIL_SMTPSERVER: ${{ secrets.EMAIL_SMTPSERVER }}
+      EMAIL_SMTPPORT: ${{ secrets.EMAIL_SMTPPORT }}
+      EMAIL_SMTPUSER: ${{ secrets.EMAIL_SMTPUSER }}
+      EMAIL_SMTPPASS: ${{ secrets.EMAIL_SMTPPASS }}
+      EMAIL_FROMEMAIL: ${{ secrets.EMAIL_FROMEMAIL }}
+      EMAIL_FROMNAME: ${{ secrets.EMAIL_FROMNAME }}
+      SQUARE_ACCESSTOKEN: ${{ secrets.SQUARE_ACCESSTOKEN }}
+      SQUARE_LOCATIONID: ${{ secrets.SQUARE_LOCATIONID }}
 
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up .NET
+      - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
 
-      - name: Restore dependencies
+      - name: Restore
         run: dotnet restore MyStoreAPI.csproj
 
       - name: Build
         run: dotnet build MyStoreAPI.csproj --no-restore --configuration Release
 
-      # Optional: Add test step if you add tests later
-      # - name: Run Tests
-      #   run: dotnet test --no-build --verbosity normal
-
-  docker-publish:
-    name: Build & Push Docker Image (Prod)
-    if: github.ref == 'refs/heads/master' && github.event_name == 'push'
-    needs: build-and-test
+  deploy-production:
+    name: 🚀 Build & Push Docker Image (Prod)
+    if: github.event_name == 'workflow_dispatch'
+    needs: build-and-validate-dev
     runs-on: ubuntu-latest
     environment: production
 
     env:
-      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-      DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+      ASPNETCORE_ENVIRONMENT: Production
+      JWT_ValidIssuer: ${{ secrets.JWT_ValidIssuer }}
+      JWT_ValidAudience: ${{ secrets.JWT_ValidAudience }}
+      JWT_Secret: ${{ secrets.JWT_Secret }}
+      JWT_TokenExpiryTimeInHour: ${{ secrets.JWT_TokenExpiryTimeInHour }}
+      CONNECTION_STRING_CONTEXT: ${{ secrets.CONNECTION_STRING_CONTEXT }}
+      CONNECTION_STRING_IDENTITY: ${{ secrets.CONNECTION_STRING_IDENTITY }}
 
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Set up Docker
         uses: docker/setup-buildx-action@v3
 
       - name: Build Docker image
-        run: docker build -t ${{ env.DOCKERHUB_USERNAME }}/mystoreapi:latest .
+        run: docker build -t manpreets115/mystoreapi:latest .
 
       - name: Login to DockerHub
-        run: echo "${{ env.DOCKERHUB_PASSWORD }}" | docker login -u "${{ env.DOCKERHUB_USERNAME }}" --password-stdin
+        run: echo "${{ secrets.DOCKERHUB_PASSWORD }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
 
       - name: Push Docker image
-        run: docker push ${{ env.DOCKERHUB_USERNAME }}/mystoreapi:latest
+        run: docker push manpreets115/mystoreapi:latest
