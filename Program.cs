@@ -13,10 +13,10 @@ using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<MyStoreAPIContext>(options =>
-    options.UseSqlServer(Environment.GetEnvironmentVariable("CONNECTION_STRING_CONTEXT")));
+    options.UseNpgsql(Environment.GetEnvironmentVariable("CONNECTION_STRING_CONTEXT")));
 
 builder.Services.AddDbContext<MyStoreAPIIdentityContext>(options =>
-    options.UseSqlServer(Environment.GetEnvironmentVariable("CONNECTION_STRING_IDENTITY")));
+    options.UseNpgsql(Environment.GetEnvironmentVariable("CONNECTION_STRING_IDENTITY")));
 
 builder.Services.Configure<SquareSettings>(options =>
 {
@@ -57,7 +57,7 @@ builder.Services.AddScoped<EmailService>();
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowClientOrigin", builder =>
+    options.AddPolicy("AllowAll", builder =>
     {
         builder.AllowAnyOrigin() // Replace with your client application's URL
             .AllowAnyHeader()
