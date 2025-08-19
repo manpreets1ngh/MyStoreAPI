@@ -13,12 +13,14 @@ using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.WebHost.UseUrls("http://0.0.0.0:8080");
-
 builder.Services.AddDbContext<MyStoreAPIContext>(options =>
-    options.UseNpgsql(Environment.GetEnvironmentVariable("CONNECTION_STRING_CONTEXT")));
+    options.UseNpgsql(
+        builder.Configuration.GetConnectionString("MyStoreAPIContext")));
 
 builder.Services.AddDbContext<MyStoreAPIIdentityContext>(options =>
-    options.UseNpgsql(Environment.GetEnvironmentVariable("CONNECTION_STRING_IDENTITY")));
+    options.UseNpgsql(
+        builder.Configuration.GetConnectionString("MyStoreAPIIdentityContextConnection")));
+
 
 builder.Services.Configure<SquareSettings>(options =>
 {

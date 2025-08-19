@@ -22,6 +22,20 @@ namespace MyStoreAPI.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            // Fix SQL Server-specific types for PostgreSQL
+            foreach (var entity in modelBuilder.Model.GetEntityTypes())
+            {
+                var props = entity.ClrType.GetProperties();
+                foreach (var prop in props)
+                {
+                    if (prop.PropertyType == typeof(Guid) || prop.PropertyType == typeof(Guid?))
+                        modelBuilder.Entity(entity.Name).Property(prop.Name).HasColumnType("uuid");
+
+                    if (prop.PropertyType == typeof(string))
+                        modelBuilder.Entity(entity.Name).Property(prop.Name).HasColumnType("text");
+                }
+            }
+            
             base.OnModelCreating(modelBuilder);
 
             // Explicit table name mapping
