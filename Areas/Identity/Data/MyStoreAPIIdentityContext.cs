@@ -17,15 +17,21 @@ public class MyStoreAPIIdentityContext : IdentityDbContext<MyStoreAPIUser>
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
+        // Fix SQL Server-specific types for PostgreSQL
+        foreach (var entity in builder.Model.GetEntityTypes())
+        {
+            var props = entity.ClrType.GetProperties();
+            foreach (var prop in props)
+            {
+                if (prop.PropertyType == typeof(Guid) || prop.PropertyType == typeof(Guid?))
+                    builder.Entity(entity.Name).Property(prop.Name).HasColumnType("uuid");
+
+                if (prop.PropertyType == typeof(string))
+                    builder.Entity(entity.Name).Property(prop.Name).HasColumnType("text");
+            }
+        }
+
         base.OnModelCreating(builder);
-/*
-        builder.Entity<AddressModel>()
-        .HasOne<MyStoreAPIUser>(a => a.User)
-        .WithMany(u => u.Addresses)
-        .HasForeignKey(a => a.UserId);*/
-        // Customize the ASP.NET Identity model and override the defaults if needed.
-        // For example, you can rename the ASP.NET Identity table names and more.
-        // Add your customizations after calling base.OnModelCreating(builder);
     }
 
     public DbSet<AddressModel> Addresses { get; set; }
