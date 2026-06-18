@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -33,6 +34,7 @@ namespace MyStoreAPI.Controllers
             _emailService = emailService;
         }
 
+        [Authorize(Policy = "AdminPolicy")]
         [HttpPost]
         [Route("register-admin")]
         public async Task<IActionResult> RegisterAdmin(RegisterModel model)

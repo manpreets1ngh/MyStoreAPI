@@ -24,6 +24,14 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
   </ItemGroup>
 
+  <!-- The test project lives in a subfolder; keep its sources out of this Web SDK project's globbing. -->
+  <ItemGroup>
+    <Compile Remove="MyStoreAPI.Tests\**" />
+    <Content Remove="MyStoreAPI.Tests\**" />
+    <EmbeddedResource Remove="MyStoreAPI.Tests\**" />
+    <None Remove="MyStoreAPI.Tests\**" />
+  </ItemGroup>
+
   <ItemGroup>
     <Content Include=".github\workflows\ci.yaml" />
   </ItemGroup>

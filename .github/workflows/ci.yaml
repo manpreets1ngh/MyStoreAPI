@@ -5,6 +5,7 @@ on:
     branches:
       - master
       - feature/**
+      - fix/**
 
   pull_request:
     branches:
@@ -46,10 +47,13 @@ jobs:
           dotnet-version: '8.0.x'
 
       - name: Restore
-        run: dotnet restore MyStoreAPI.csproj
+        run: dotnet restore MyStoreAPI.sln
 
       - name: Build
-        run: dotnet build MyStoreAPI.csproj --no-restore --configuration Release
+        run: dotnet build MyStoreAPI.sln --no-restore --configuration Release
+
+      - name: Test
+        run: dotnet test MyStoreAPI.sln --no-build --configuration Release --verbosity normal
 
   deploy-production:
     name: 🚀 Build & Push Docker Image (Prod)

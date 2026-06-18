@@ -162,3 +162,6 @@ app.Use(async (context, next) =>
 app.MapControllers();
 
 app.Run();
+
+// Exposed so the test project (MyStoreAPI.Tests) can use WebApplicationFactory<Program>.
+public partial class Program { }
