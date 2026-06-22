@@ -1,0 +1,52 @@
+# Local dev stack: the MyStoreAPI app + a PostgreSQL database.
+# Usage:  docker compose up --build
+# API:    http://localhost:8080/swagger
+# Stop:   docker compose down        (add -v to also wipe the database volume)
+
+services:
+  db:
+    image: postgres:16
+    container_name: mystore-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: mystore
+    ports:
+      # Exposed so you can connect from the host (e.g. pgAdmin/psql) on localhost:5432.
+      - "5432:5432"
+    volumes:
+      - mystore-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d mystore"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mystore-api
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+
+      # Both EF Core DbContexts point at the same local Postgres instance.
+      # In .NET, "__" maps to ":" so this fills ConnectionStrings:<name>.
+      ConnectionStrings__MyStoreAPIContext: "Host=db;Port=5432;Database=mystore;Username=postgres;Password=postgres"
+      ConnectionStrings__MyStoreAPIIdentityContextConnection: "Host=db;Port=5432;Database=mystore;Username=postgres;Password=postgres"
+
+      # JWT settings. Program.cs reads these JWT_* env vars and they override appsettings.
+      # JWT_Secret MUST be valid Base64 (it is decoded with Convert.FromBase64String).
+      # This is a throwaway DEV-ONLY secret — never reuse it anywhere real.
+      JWT_ValidIssuer: "http://localhost:8080"
+      JWT_ValidAudience: "http://localhost:8080"
+      JWT_Secret: "MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY="
+      JWT_TokenExpiryTimeInHour: "1"
+
+volumes:
+  mystore-db-data:
