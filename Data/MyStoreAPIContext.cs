@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using MyStoreAPI.Areas.Identity.Data;
 using MyStoreAPI.Models;
 
 namespace MyStoreAPI.Data
@@ -22,6 +23,20 @@ namespace MyStoreAPI.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            // These types are NOT owned by this context:
+            //  - AddressModel is mapped by MyStoreAPIIdentityContext (the "Addresses" table).
+            //  - AddressResponseViewModel is a response DTO populated in memory (see
+            //    OrdersService), never queried via EF.
+            // Mapping them here would create duplicate Address/User tables. Keep
+            // ShippingAddressId / AddressId as plain Guid columns (cross-context reference).
+            modelBuilder.Entity<Order>().Ignore(o => o.ShippingAddress);
+            modelBuilder.Entity<OrderDetail>().Ignore(od => od.Address);
+            modelBuilder.Ignore<AddressModel>();
+            modelBuilder.Ignore<AddressResponseViewModel>();
+            // MyStoreAPIUser is owned by the Identity context; ignore it here too, otherwise
+            // it lingers as an orphan once AddressModel (its only reference) is ignored.
+            modelBuilder.Ignore<MyStoreAPIUser>();
+
             // Fix SQL Server-specific types for PostgreSQL
             foreach (var entity in modelBuilder.Model.GetEntityTypes())
             {
@@ -50,16 +65,11 @@ namespace MyStoreAPI.Data
                 .HasIndex(o => o.OrderNumber)
                 .IsUnique();
 
-            // Relationships
+            // Relationships (only entities owned by this context)
             modelBuilder.Entity<Order>()
                 .HasOne(o => o.ShippingInfo)
                 .WithMany()
                 .HasForeignKey(o => o.ShippingInfoId);
-
-            modelBuilder.Entity<Order>()
-                .HasOne(o => o.ShippingAddress)
-                .WithMany()
-                .HasForeignKey(o => o.ShippingAddressId);
 
             modelBuilder.Entity<ShippingInfoModel>()
                 .HasOne(s => s.DeliveryStatus)
@@ -70,11 +80,6 @@ namespace MyStoreAPI.Data
                 .HasOne(od => od.Product)
                 .WithMany()
                 .HasForeignKey(od => od.ProductId);
-
-            modelBuilder.Entity<OrderDetail>()
-                .HasOne(od => od.Address)
-                .WithMany()
-                .HasForeignKey(od => od.AddressId);
 
         }
 

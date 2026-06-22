@@ -19,7 +19,9 @@ builder.Services.AddDbContext<MyStoreAPIContext>(options =>
 
 builder.Services.AddDbContext<MyStoreAPIIdentityContext>(options =>
     options.UseNpgsql(
-        builder.Configuration.GetConnectionString("MyStoreAPIIdentityContextConnection")));
+        builder.Configuration.GetConnectionString("MyStoreAPIIdentityContextConnection"),
+        // Both contexts can share one database; keep their migration histories separate.
+        npgsql => npgsql.MigrationsHistoryTable("__EFMigrationsHistory_Identity")));
 
 
 builder.Services.Configure<SquareSettings>(options =>
@@ -129,6 +131,17 @@ builder.Services.AddAuthorization(options =>
 });
 
 var app = builder.Build();
+
+// Apply EF Core migrations on startup only when explicitly opted in (the Docker compose
+// stack sets RunMigrationsAtStartup=true). This stays off by default so integration tests
+// and plain `dotnet run` don't try to reach / mutate a database during boot.
+if (builder.Configuration.GetValue<bool>("RunMigrationsAtStartup"))
+{
+    using var scope = app.Services.CreateScope();
+    var services = scope.ServiceProvider;
+    services.GetRequiredService<MyStoreAPIContext>().Database.Migrate();
+    services.GetRequiredService<MyStoreAPIIdentityContext>().Database.Migrate();
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

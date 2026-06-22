@@ -35,18 +35,30 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: Development
 
+      # Apply EF Core migrations automatically on container startup (creates the schema).
+      RunMigrationsAtStartup: "true"
+
       # Both EF Core DbContexts point at the same local Postgres instance.
       # In .NET, "__" maps to ":" so this fills ConnectionStrings:<name>.
       ConnectionStrings__MyStoreAPIContext: "Host=db;Port=5432;Database=mystore;Username=postgres;Password=postgres"
       ConnectionStrings__MyStoreAPIIdentityContextConnection: "Host=db;Port=5432;Database=mystore;Username=postgres;Password=postgres"
 
-      # JWT settings. Program.cs reads these JWT_* env vars and they override appsettings.
-      # JWT_Secret MUST be valid Base64 (it is decoded with Convert.FromBase64String).
-      # This is a throwaway DEV-ONLY secret — never reuse it anywhere real.
-      JWT_ValidIssuer: "http://localhost:8080"
-      JWT_ValidAudience: "http://localhost:8080"
+      # JWT settings (DEV-ONLY throwaway values — never reuse anywhere real).
+      # The app reads the secret two different ways, so we set BOTH forms to the same value:
+      #   - JWT_Secret  (single _) : read by Program.cs via Environment.GetEnvironmentVariable
+      #                              to build the token *validation* key.
+      #   - JWT__Secret (double __): maps to config key "JWT:Secret", which AuthController
+      #                              uses to *generate* tokens. The "__" is how .NET turns an
+      #                              env var into a nested config key (JWT:Secret).
+      # Secret MUST be valid Base64 AND decode to >= 32 bytes (HMAC-SHA256 needs >= 256 bits).
       JWT_Secret: "MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY="
+      JWT__Secret: "MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY="
+      JWT_ValidIssuer: "http://localhost:8080"
+      JWT__ValidIssuer: "http://localhost:8080"
+      JWT_ValidAudience: "http://localhost:8080"
+      JWT__ValidAudience: "http://localhost:8080"
       JWT_TokenExpiryTimeInHour: "1"
+      JWT__TokenExpiryTimeInHour: "1"
 
 volumes:
   mystore-db-data:

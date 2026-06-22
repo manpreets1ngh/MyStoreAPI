@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MyStoreAPI.Models
 {
@@ -8,7 +7,9 @@ namespace MyStoreAPI.Models
         [Key]
         public Guid CardId { get; set; }
 
-        [ForeignKey("User")]
+        // Stores the owning user's id. No EF navigation/FK is configured here, so this
+        // is a plain column (the previous [ForeignKey("User")] referenced a navigation
+        // that does not exist and broke model building).
         public string UserId { get; set; }
         public string CardHolderName { get; set; }
         public string Last4Digits { get; set; }
